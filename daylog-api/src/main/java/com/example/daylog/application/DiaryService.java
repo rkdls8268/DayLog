@@ -21,4 +21,10 @@ public class DiaryService {
         List<Diary> diaries = diaryRepository.findAll();
         return diaries;
     }
+
+    public Diary addDiary(Diary diary) {
+        Diary saved = diaryRepository.save(diary);
+        // save() 는 미리 만들어져있음!
+        return saved;
+    }
 }
