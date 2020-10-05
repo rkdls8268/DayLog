@@ -1,1 +1,3 @@
 rootProject.name = 'daylog'
+
+include 'daylog-api'
