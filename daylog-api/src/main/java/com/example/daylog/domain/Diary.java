@@ -28,9 +28,13 @@ public class Diary {
 
     private String weather;
 
+    private String mood;
+
     private String food;
 
     private String keyword;
+
+    private String photo;
 
     private String content;
 }
