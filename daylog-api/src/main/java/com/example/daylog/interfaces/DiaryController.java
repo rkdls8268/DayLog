@@ -5,6 +5,8 @@ import com.example.daylog.application.DiaryService;
 import com.example.daylog.domain.DiaryAlreadyExistedException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,25 +23,38 @@ import java.util.Optional;
 @RestController
 public class DiaryController {
 
+    private static Logger logger = LoggerFactory.getLogger(DiaryController.class);
+
     @Autowired
     private DiaryService diaryService;
 
     @GetMapping("/diary")
-    public JSONObject list() {
+    public List<Diary> list() {
         List<Diary> diaries = diaryService.getDiaries();
-        JSONObject jsonDiaries = new JSONObject();
-        JSONObject data = new JSONObject();
-        JSONArray arr = new JSONArray();
-        for(Diary d : diaries) {
-            data.put("id", d.getId());
-            data.put("date", d.getDate());
-            data.put("photo", d.getPhoto());
-            data.put("content", d.getContent());
-            // data.put("title", d.getTitle());
-            arr.add(data);
-        }
-        jsonDiaries.put("data", arr);
-        return jsonDiaries;
+//        JSONObject jsonDiaries = new JSONObject();
+//        JSONObject data = new JSONObject();
+//        List<JSONObject> arr = new ArrayList<>();
+//        List<JSONObject> list = new ArrayList<>();
+//        // TODO: 다이어리에 있는 내용들 리스트에 저장
+//        for (Diary d : diaries) {
+//            JSONObject.
+//        }
+//
+//        // todo: 리스트에 있는 값들을 JSONArray에 저장
+//        for(Diary d : diaries) {
+//            data.put("id", d.getId());
+//            logger.info(d.getId().toString());
+//            data.put("date", d.getDate());
+//            data.put("photo", d.getPhoto());
+//            data.put("content", d.getContent());
+//            logger.info(data.toJSONString());
+//            arr.add(data);
+//            // data.put("title", d.getTitle());
+//            logger.info(arr.toString());
+//        }
+////        arr.add(data);
+//        jsonDiaries.put("data", arr);
+        return diaries;
     }
 
     @GetMapping("/diary/{id}")
