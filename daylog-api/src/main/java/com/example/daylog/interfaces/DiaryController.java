@@ -2,11 +2,13 @@ package com.example.daylog.interfaces;
 
 import com.example.daylog.domain.Diary;
 import com.example.daylog.application.DiaryService;
+import com.example.daylog.domain.DiaryAlreadyExistedException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -34,8 +36,8 @@ public class DiaryController {
             data.put("content", d.getContent());
             // data.put("title", d.getTitle());
             arr.add(data);
-            jsonDiaries.put("data", arr);
         }
+        jsonDiaries.put("data", arr);
         return jsonDiaries;
     }
 
@@ -57,7 +59,7 @@ public class DiaryController {
     public ResponseEntity<?> create(
             @RequestBody Diary resource
     ) throws URISyntaxException {
-        SimpleDateFormat format1 = new SimpleDateFormat("yyyy년 MM월 dd일 HH:mm");
+        SimpleDateFormat format1 = new SimpleDateFormat("yyyy년 MM월 dd일");
         String title = resource.getTitle();
         String date = format1.format(System.currentTimeMillis());
         String weather = resource.getWeather();
@@ -66,22 +68,25 @@ public class DiaryController {
         String keyword = resource.getKeyword();
         String content = resource.getContent();
 
-        // TODO: 이미 작성된 날짜가 있으면 예외처리
+        Diary today = diaryService.getTodaysDiaryByDate(date);
+        if (today != null) {
+            throw new DiaryAlreadyExistedException(resource.getId());
+        } else {
+            Diary diary = Diary.builder()
+                    .title(title)
+                    .date(date)
+                    .weather(weather)
+                    .mood(mood)
+                    .food(food)
+                    .keyword(keyword)
+                    .content(content)
+                    .build();
 
-        Diary diary = Diary.builder()
-                .title(title)
-                .date(date)
-                .weather(weather)
-                .mood(mood)
-                .food(food)
-                .keyword(keyword)
-                .content(content)
-                .build();
+            diaryService.addDiary(diary);
 
-        diaryService.addDiary(diary);
+            String url = "/diary";
 
-        String url = "/diary";
-
-        return ResponseEntity.created(new URI(url)).body("{\"message\":\"created\"}");
+            return ResponseEntity.created(new URI(url)).body("{\"message\":\"created\"}");
+        }
     }
 }

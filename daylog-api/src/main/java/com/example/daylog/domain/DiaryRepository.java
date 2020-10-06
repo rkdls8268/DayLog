@@ -10,4 +10,6 @@ public interface DiaryRepository extends CrudRepository<Diary, Long> {
 
 //    @Override
     Optional<Diary> findById(Long id);
+
+    Diary findDiaryByDate(String date);
 }

@@ -1,6 +1,7 @@
 package com.example.daylog.application;
 
 import com.example.daylog.domain.Diary;
+import com.example.daylog.domain.DiaryNotFoundException;
 import com.example.daylog.domain.DiaryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,13 @@ public class DiaryService {
     }
 
     public Diary getDiaryById(Long id) {
-        Diary diary = diaryRepository.findById(id).orElse(null);
+        Diary diary = diaryRepository.findById(id)
+                .orElseThrow(() -> new DiaryNotFoundException(id));
+        return diary;
+    }
+
+    public Diary getTodaysDiaryByDate(String date) {
+        Diary diary = diaryRepository.findDiaryByDate(date);
         return diary;
     }
 }
