@@ -1,7 +1,60 @@
 package com.example.daylog.interfaces;
 
+import com.example.daylog.application.DiaryService;
+import com.example.daylog.domain.Diary;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-class DiaryControllerTest {
 
+@ExtendWith(SpringExtension.class)
+@WebMvcTest(DiaryController.class)
+public class DiaryControllerTest {
+
+    @Autowired // 직접 만들지 않아도 스프링에서 알아서 넣어줌
+    protected MockMvc mvc;
+
+    @MockBean
+    private DiaryService diaryService;
+
+    @Test
+    public void list() throws Exception {
+        List<Diary> diaries = new ArrayList<>();
+        diaries.add(Diary.builder()
+                .id(1004L)
+                .weather("sunny")
+                .food("noodle")
+                .mood("awesome")
+                .title("nice day with Steve")
+                .build());
+        given(diaryService.getDiaries()).willReturn(diaries);
+
+        mvc.perform(MockMvcRequestBuilders.get("/diary"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(
+                        containsString("\"id\":1004")
+                )).andExpect(content().string(
+                        containsString("\"weather\":\"sunny\"")
+                )).andExpect(content().string(
+                        containsString("\"food\":\"noodle\"")
+                )).andExpect(content().string(
+                        containsString("\"mood\":\"awesome\"")
+                )).andExpect(content().string(
+                        containsString("\"title\":\"nice day with Steve\"")
+                ));
+    }
 }
