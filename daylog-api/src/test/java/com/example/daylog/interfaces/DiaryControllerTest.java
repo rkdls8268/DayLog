@@ -2,6 +2,7 @@ package com.example.daylog.interfaces;
 
 import com.example.daylog.application.DiaryService;
 import com.example.daylog.domain.Diary;
+import com.example.daylog.domain.DiaryNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,4 +58,41 @@ public class DiaryControllerTest {
                         containsString("\"title\":\"nice day with Steve\"")
                 ));
     }
+
+    @Test
+    public void detailWithExisted() throws Exception {
+        Diary diary = Diary.builder()
+                .id(1004L)
+                .date("2020-12-20")
+                .photo("sunny.jpg")
+                .title("nice day with Steve")
+                .content("nice nice gooooood sunny day with Steve")
+                .build();
+
+        given(diaryService.getDiaryById(1004L)).willReturn(diary);
+
+        mvc.perform(MockMvcRequestBuilders.get("/diary/1004"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(
+                        containsString("\"id\":1004")
+                )).andExpect(content().string(
+                        containsString("\"date\":\"2020-12-20\"")
+                )).andExpect(content().string(
+                        containsString("\"photo\":\"sunny.jpg\"")
+                )).andExpect(content().string(
+                        containsString("\"title\":\"nice day with Steve\"")
+                )).andExpect(content().string(
+                        containsString("\"content\":\"nice nice gooooood sunny day with Steve\"")
+                ));
+    }
+
+    @Test
+    public void detailWithNotExisted() throws Exception {
+        given(diaryService.getDiaryById(404L))
+                .willThrow(new DiaryNotFoundException(404L));
+        mvc.perform(MockMvcRequestBuilders.get("/diary/404"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("{\"message\":\"Could not find diary\"}"));
+    }
+
 }
