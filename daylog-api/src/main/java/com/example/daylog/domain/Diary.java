@@ -1,11 +1,13 @@
 package com.example.daylog.domain;
 
-import com.sun.istack.NotNull;
+//import com.sun.istack.NotNull;
 import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Getter
@@ -22,6 +24,7 @@ public class Diary {
     @NotNull
     private String title;
 
+    @NotEmpty
     private String date;
 
     private String weather;

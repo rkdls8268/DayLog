@@ -5,9 +5,11 @@ import com.example.daylog.domain.Diary;
 import com.example.daylog.domain.DiaryNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -95,4 +97,33 @@ public class DiaryControllerTest {
                 .andExpect(content().string("{\"message\":\"Could not find diary\"}"));
     }
 
+    @Test
+    public void createWithValidData() throws Exception {
+        Diary diary = Diary.builder()
+                .id(1234L)
+                .date("2020-12-21")
+                .weather("sunny")
+                .mood("happy")
+                .food("pasta")
+                .keyword("nice!!!")
+                .content("nice day with Steve")
+                .title("good day")
+                .build();
+        mvc.perform(MockMvcRequestBuilders.post("/diary")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"date\":\"2020-12-21\", \"weather\":\"sunny\", \"mood\":\"happy\", \"food\":\"pasta\", \"keyword\":\"nice!!!\", \"content\":\"nice day with Steve\", \"title\":\"good day\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("location", "/diary"))
+                .andExpect(content().string("{\"message\":\"created\"}"));
+
+        verify(diaryService).addDiary(ArgumentMatchers.any());
+    }
+
+    @Test
+    public void createWithInvalidData() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/diary")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+                .andExpect(status().isBadRequest());
+    }
 }
